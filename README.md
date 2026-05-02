@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🚀 TaskFlow Pro - Team Task Manager
 
 A full-stack MERN application for team task management with role-based access control, real-time dashboards, and project tracking.
@@ -28,3 +29,6 @@ A full-stack MERN application for team task management with role-based access co
 ```bash
 git clone https://github.com/Prateek6902/team-task-manager.git
 cd team-task-manager
+=======
+# Task-Management-Application
+>>>>>>> 5028696f0994764f16c62e4a98f7aeec04f272e5
