@@ -7,7 +7,7 @@ dotenv.config();
 
 const app = express();
 
-// ================= 🔥 FORCE CORS (NO LIBRARY) =================
+// ================= 🔥 FORCE CORS =================
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader(
@@ -19,7 +19,6 @@ app.use((req, res, next) => {
     'Content-Type, Authorization'
   );
 
-  // ✅ HANDLE PREFLIGHT HERE (THIS IS THE REAL FIX)
   if (req.method === 'OPTIONS') {
     return res.sendStatus(200);
   }
@@ -33,6 +32,11 @@ app.use(express.urlencoded({ extended: true }));
 
 // ================= ROUTES =================
 app.use('/api/auth', require('./routes/auth'));
+
+// 🔥 ADD THESE (THIS FIXES YOUR 404)
+app.use('/api/projects', require('./routes/projects'));
+app.use('/api/tasks', require('./routes/tasks'));
+app.use('/api/dashboard', require('./routes/dashboard'));
 
 // ================= PRODUCTION =================
 if (process.env.NODE_ENV === 'production') {
