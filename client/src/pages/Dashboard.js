@@ -35,23 +35,24 @@ const Dashboard = () => {
   }, []);
 
   const fetchDashboardData = async () => {
-    try {
-      setLoading(true);
-      const response = await dashboardService.getDashboardData();
-      const dashboardData = response.data || response;
-      
-      if (dashboardData) {
-        setStats(dashboardData.stats || {});
-        setRecentTasks(dashboardData.recentTasks || []);
-        setChartData(dashboardData.weeklyData || []);
-      }
-    } catch (error) {
-      console.error('Dashboard error:', error);
-      toast.error('Failed to load dashboard data');
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+
+    const res = await dashboardService.getDashboardData();
+
+    const data = res.data || res;
+
+    setStats(data.stats || {});
+    setRecentTasks(data.recentTasks || []);
+    setChartData(data.weeklyData || []);
+
+  } catch (error) {
+    console.error('Dashboard error:', error);
+    toast.error('Failed to load dashboard data');
+  } finally {
+    setLoading(false);
+  }
+};
 
   // ... rest of your Dashboard component stays the same ...
 };
