@@ -9,18 +9,18 @@ dotenv.config();
 const app = express();
 
 // ================= CORS CONFIG (FINAL FIX) =================
-app.use(cors({
-  origin: [
-    'https://team-task-manager-gtdo.onrender.com', // frontend
-    'http://localhost:3000' // local dev
-  ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
+// 🔥 FORCE CORS (guaranteed fix)
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,PATCH,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-// Handle preflight requests
-app.options('*', cors());
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
 
 // ================= BODY PARSER =================
 app.use(express.json());
