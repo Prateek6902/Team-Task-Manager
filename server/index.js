@@ -10,17 +10,15 @@ const app = express();
 
 // ================= CORS CONFIG (FINAL FIX) =================
 // 🔥 FORCE CORS (guaranteed fix)
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,PATCH,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+// 🔥 FINAL WORKING CORS FIX
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
-
-  next();
-});
+// ✅ MUST HANDLE PREFLIGHT BEFORE ROUTES
+app.options('*', cors());
 
 // ================= BODY PARSER =================
 app.use(express.json());
