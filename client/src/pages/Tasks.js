@@ -34,18 +34,21 @@ const Tasks = () => {
   }, [filters]);
 
   const fetchTasks = async () => {
-    try {
-      setLoading(true);
-      const response = await taskService.getTasks(filters);
-      const tasksData = response.data || response.tasks || [];
-      setTasks(Array.isArray(tasksData) ? tasksData : []);
-    } catch (error) {
-      console.error('Error fetching tasks:', error);
-      setTasks([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+
+    const res = await taskService.getTasks(filters);
+    const data = res.data || res;
+
+    setTasks(Array.isArray(data) ? data : []);
+
+  } catch (error) {
+    console.error('Error fetching tasks:', error);
+    setTasks([]);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleSubmit = async () => {
     try {
