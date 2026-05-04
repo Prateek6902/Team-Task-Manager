@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import api from './api';
+import api from '../services/api';
 
 const AuthContext = createContext();
 
@@ -30,8 +30,6 @@ const token = localStorage.getItem('token');
   }
 
   const res = await api.get('/auth/me');
-
-  // ✅ FIXED
   setUser(res.user);
 
 } catch (error) {
@@ -53,7 +51,6 @@ password
 });
 
 ```
-  // ✅ FIXED
   const { token, user } = res;
 
   localStorage.setItem('token', token);
@@ -61,7 +58,6 @@ password
 
   return { success: true };
 } catch (error) {
-  console.error('Login error:', error);
   return {
     success: false,
     message: error?.response?.data?.message || 'Login failed'
@@ -80,7 +76,6 @@ password
 });
 
 ```
-  // ✅ FIXED
   const { token, user } = res;
 
   localStorage.setItem('token', token);
@@ -88,7 +83,6 @@ password
 
   return { success: true };
 } catch (error) {
-  console.error('Registration error:', error);
   return {
     success: false,
     message: error?.response?.data?.message || 'Register failed'
