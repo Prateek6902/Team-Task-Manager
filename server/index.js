@@ -22,7 +22,10 @@ app.options('*', cors());
 
 // ================= BODY PARSER =================
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
+// ✅ THIS MUST COME BEFORE ROUTES
+app.use(cors());
+app.options('*', cors());
 
 // ================= ROUTES (IMPORTANT: BEFORE STATIC) =================
 const authRoutes = require('./routes/auth');
