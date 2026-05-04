@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { getMe, login, register, logout } from '../services/authService';
+import { login as loginAPI, register as registerAPI, getMe } from '../services/authService';
 
 const AuthContext = createContext();
 
@@ -35,9 +35,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const handleLogin = async (email, password) => {
+  const login = async (email, password) => {
     try {
-      const response = await login(email, password);
+      const response = await loginAPI(email, password);
       const { token, user: userData } = response;
       localStorage.setItem('token', token);
       setUser(userData);
@@ -45,14 +45,14 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       return {
         success: false,
-        message: error.response?.data?.message || 'Login failed'
+        message: error?.response?.data?.message || error?.message || 'Login failed'
       };
     }
   };
 
-  const handleRegister = async (name, email, password) => {
+  const register = async (name, email, password) => {
     try {
-      const response = await register({ name, email, password });
+      const response = await registerAPI({ name, email, password });
       const { token, user: userData } = response;
       localStorage.setItem('token', token);
       setUser(userData);
@@ -60,12 +60,12 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       return {
         success: false,
-        message: error.response?.data?.message || 'Registration failed'
+        message: error?.response?.data?.message || error?.message || 'Registration failed'
       };
     }
   };
 
-  const handleLogout = () => {
+  const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
   };
@@ -73,9 +73,9 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     loading,
-    login: handleLogin,
-    register: handleRegister,
-    logout: handleLogout
+    login,
+    register,
+    logout
   };
 
   return (
