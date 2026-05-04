@@ -18,19 +18,22 @@ const Team = () => {
   }, []);
 
   const fetchTeamMembers = async () => {
-    try {
-      setLoading(true);
-      const response = await userService.getUsers();
-      const usersData = response.data || response.users || [];
-      setMembers(Array.isArray(usersData) ? usersData : []);
-    } catch (error) {
-      console.error('Error fetching team:', error);
-      toast.error('Failed to load team members');
-      setMembers([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+
+    const res = await userService.getUsers();
+    const data = res.data || res;
+
+    setMembers(Array.isArray(data) ? data : []);
+
+  } catch (error) {
+    console.error('Error fetching team:', error);
+    toast.error('Failed to load team members');
+    setMembers([]);
+  } finally {
+    setLoading(false);
+  }
+};
 
   // ... rest of your Team component stays the same ...
 };
