@@ -1,7 +1,9 @@
 import axios from 'axios';
 
-// Use environment variable (Render)
-const API_URL = process.env.REACT_APP_API_URL;
+// Use env OR fallback (IMPORTANT)
+const API_URL =
+  process.env.REACT_APP_API_URL ||
+  "https://team-task-manager-3-jks2.onrender.com";
 
 const api = axios.create({
   baseURL: `${API_URL}/api`,
@@ -10,7 +12,7 @@ const api = axios.create({
   }
 });
 
-// Request interceptor - Add auth token
+// Request interceptor
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -22,7 +24,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor - Handle errors
+// Response interceptor
 api.interceptors.response.use(
   (response) => response.data,
   (error) => {
