@@ -47,14 +47,18 @@ const login = async (email, password) => {
   try {
     const res = await api.post('/auth/login', { email, password });
 
+    // 🔥 CORRECT STRUCTURE
     const { token, user } = res.data || res;
 
-    localStorage.setItem('token', token); // ✅ IMPORTANT
+    localStorage.setItem('token', token);
     setUser(user);
 
     return { success: true };
   } catch (error) {
-    return { success: false };
+    return {
+      success: false,
+      message: error?.response?.data?.message || 'Login failed'
+    };
   }
 };
 
