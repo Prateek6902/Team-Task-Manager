@@ -1,6 +1,5 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
 
@@ -8,50 +7,43 @@ dotenv.config();
 
 const app = express();
 
-// ================= CORS CONFIG (FINAL FIX) =================
-// 🔥 FORCE CORS (guaranteed fix)
-// 🔥 FINAL WORKING CORS FIX
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+// ================= 🔥 FORCE CORS (NO LIBRARY) =================
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'GET, POST, PUT, DELETE, PATCH, OPTIONS'
+  );
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'Content-Type, Authorization'
+  );
 
-// ✅ MUST HANDLE PREFLIGHT BEFORE ROUTES
-app.options('*', cors());
+  // ✅ HANDLE PREFLIGHT HERE (THIS IS THE REAL FIX)
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
 
-// ================= BODY PARSER =================
+  next();
+});
+
+// ================= BODY =================
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// ✅ THIS MUST COME BEFORE ROUTES
-app.use(cors());
-app.options('*', cors());
-
-// ================= ROUTES (IMPORTANT: BEFORE STATIC) =================
-const authRoutes = require('./routes/auth');
-
-app.use('/api/auth', authRoutes);
+// ================= ROUTES =================
+app.use('/api/auth', require('./routes/auth'));
 
 // ================= PRODUCTION =================
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/build')));
 
-  // React SPA fallback
   app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
   });
 }
 
-// ================= ERROR HANDLER =================
-app.use((err, req, res, next) => {
-  console.error('Global error:', err);
-  res.status(500).json({
-    success: false,
-    message: 'Internal Server Error'
-  });
-});
-
-// ================= START SERVER =================
+// ================= START =================
 const PORT = process.env.PORT || 5000;
 
 mongoose.connect(process.env.MONGODB_URI)
