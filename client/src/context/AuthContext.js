@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
+import api from './api'; // make sure path is correct
 
 const AuthContext = createContext();
 
@@ -15,18 +15,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Set up axios defaults
-  axios.defaults.baseURL = 'https://team-task-manager-3-jks2.onrender.com/api';
-  
-  // Add token to requests
-  axios.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  });
-
   useEffect(() => {
     checkAuth();
   }, []);
@@ -34,23 +22,21 @@ export const AuthProvider = ({ children }) => {
   const checkAuth = async () => {
     try {
       const token = localStorage.getItem('token');
-      
-      // If no token, skip check
+
       if (!token) {
         setLoading(false);
         return;
       }
-      
-      const response = await axios.get('/auth/me');
-      setUser(response.data.data || response.data.user);
+
+      const response = await api.get('/auth/me');
+      setUser(response.data || response.user);
     } catch (error) {
       console.log('Auth check failed:', error.message);
-      // Don't remove token on network error - server might be down
+
       if (error.response && error.response.status === 401) {
         localStorage.removeItem('token');
         setUser(null);
       }
-      // For network errors, keep the user logged in if they have a token
     } finally {
       setLoading(false);
     }
@@ -58,43 +44,43 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('/auth/login', {
+      const response = await api.post('/auth/login', {
         email,
         password
       });
-      
-      const { token, user: userData } = response.data;
+
+      const { token, user: userData } = response;
       localStorage.setItem('token', token);
       setUser(userData);
-      
+
       return { success: true };
     } catch (error) {
       console.error('Login error:', error);
       return {
         success: false,
-        message: error.response?.data?.message || 'Cannot connect to server. Please try again.'
+        message: error?.message || 'Cannot connect to server'
       };
     }
   };
 
   const register = async (name, email, password) => {
     try {
-      const response = await axios.post('/auth/register', {
+      const response = await api.post('/auth/register', {
         name,
         email,
         password
       });
-      
-      const { token, user: userData } = response.data;
+
+      const { token, user: userData } = response;
       localStorage.setItem('token', token);
       setUser(userData);
-      
+
       return { success: true };
     } catch (error) {
       console.error('Registration error:', error);
       return {
         success: false,
-        message: error.response?.data?.message || 'Cannot connect to server. Please try again.'
+        message: error?.message || 'Cannot connect to server'
       };
     }
   };
@@ -104,16 +90,8 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  const value = {
-    user,
-    loading,
-    login,
-    register,
-    logout
-  };
-
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
