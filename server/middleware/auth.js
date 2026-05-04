@@ -3,6 +3,12 @@ const User = require('../models/User');
 
 // Protect routes - Authentication middleware
 exports.protect = async (req, res, next) => {
+
+  // 🔥 FIX: allow preflight requests
+  if (req.method === 'OPTIONS') {
+    return next();
+  }
+
   let token;
 
   // Check for token in headers
@@ -45,17 +51,4 @@ exports.protect = async (req, res, next) => {
       message: 'Not authorized to access this route'
     });
   }
-};
-
-// Grant access to specific roles
-exports.authorize = (...roles) => {
-  return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({
-        success: false,
-        message: `User role '${req.user.role}' is not authorized to access this route`
-      });
-    }
-    next();
-  };
 };
