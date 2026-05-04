@@ -97,7 +97,7 @@ toast.success('User created successfully');
   console.error(error);
   toast.error(error?.response?.data?.message || 'Operation failed');
 }
-```
+
 
 };
 
@@ -114,7 +114,7 @@ try {
   console.error(error);
   toast.error('Failed to delete user');
 }
-```
+
 
 };
 
