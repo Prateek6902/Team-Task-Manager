@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   // Set up axios defaults
-  axios.defaults.baseURL = 'http://localhost:5000/api';
+  axios.defaults.baseURL = 'https://team-task-manager-3-jks2.onrender.com';
   
   // Add token to requests
   axios.interceptors.request.use((config) => {
