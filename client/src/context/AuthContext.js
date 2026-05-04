@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import api from '../services/api'; // ✅ FIXED PATH
+import * as authService from '../services/authService';
 
 const AuthContext = createContext();
 
@@ -22,23 +22,14 @@ export const AuthProvider = ({ children }) => {
   const checkAuth = async () => {
     try {
       const token = localStorage.getItem('token');
-
-      if (!token) {
-        setLoading(false);
-        return;
+      if (token) {
+        const response = await authService.getCurrentUser();
+        setUser(response.data || response.user);
       }
-
-      const response = await api.get('/auth/me');
-
-      // ✅ FIXED (api already returns data)
-      setUser(response.data || response.user || response);
     } catch (error) {
       console.log('Auth check failed:', error.message);
-
-      if (error.response && error.response.status === 401) {
-        localStorage.removeItem('token');
-        setUser(null);
-      }
+      localStorage.removeItem('token');
+      setUser(null);
     } finally {
       setLoading(false);
     }
@@ -46,47 +37,30 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await api.post('/auth/login', {
-        email,
-        password
-      });
-
-      // ✅ FIXED (no .data here)
+      const response = await authService.loginUser(email, password);
       const { token, user: userData } = response;
-
       localStorage.setItem('token', token);
       setUser(userData);
-
       return { success: true };
     } catch (error) {
-      console.error('Login error:', error);
       return {
         success: false,
-        message: error?.response?.data?.message || 'Cannot connect to server'
+        message: error.response?.data?.message || 'Login failed. Please check your connection.'
       };
     }
   };
 
   const register = async (name, email, password) => {
     try {
-      const response = await api.post('/auth/register', {
-        name,
-        email,
-        password
-      });
-
-      // ✅ FIXED
+      const response = await authService.registerUser({ name, email, password });
       const { token, user: userData } = response;
-
       localStorage.setItem('token', token);
       setUser(userData);
-
       return { success: true };
     } catch (error) {
-      console.error('Registration error:', error);
       return {
         success: false,
-        message: error?.response?.data?.message || 'Cannot connect to server'
+        message: error.response?.data?.message || 'Registration failed. Please check your connection.'
       };
     }
   };
@@ -96,8 +70,17 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const value = {
+    user,
+    loading,
+    login,
+    register,
+    logout,
+    checkAuth
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
