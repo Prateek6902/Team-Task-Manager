@@ -1,40 +1,30 @@
-import axios from 'axios';
+import axios from "axios";
 
-// For production: Use RELATIVE URLs (no domain needed)
-// For development: Use localhost
-const API_URL = process.env.NODE_ENV === 'production' 
-  ? ''  // Empty string = use relative URLs
-  : 'http://localhost:5000';
+const API =
+  process.env.REACT_APP_API_URL ||
+  "https://team-task-manager-3-jks2.onrender.com";
 
 const api = axios.create({
-  baseURL: `${API_URL}/api`,
+  baseURL: `${API}/api`,
   headers: {
-    'Content-Type': 'application/json'
+    "Content-Type": "application/json",
   },
-  timeout: 15000
 });
 
-// Request interceptor - Add auth token
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
-// Response interceptor - Handle errors
 api.interceptors.response.use(
   (response) => response.data,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
-      }
+      localStorage.removeItem("token");
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   }
