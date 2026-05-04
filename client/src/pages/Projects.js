@@ -34,20 +34,22 @@ const Projects = () => {
   }, []);
 
   const fetchProjects = async () => {
-    try {
-      setLoading(true);
-      const response = await projectService.getProjects();
-      const projectsData = response.data || response.projects || [];
-      setProjects(Array.isArray(projectsData) ? projectsData : []);
-    } catch (error) {
-      console.error('Error fetching projects:', error);
-      toast.error('Failed to load projects');
-      setProjects([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
 
+    const res = await projectService.getProjects();
+    const data = res.data || res;
+
+    setProjects(Array.isArray(data) ? data : []);
+
+  } catch (error) {
+    console.error('Error fetching projects:', error);
+    toast.error('Failed to load projects');
+    setProjects([]);
+  } finally {
+    setLoading(false);
+  }
+};
   const handleCreateProject = async () => {
     try {
       if (!newProject.name.trim()) {
