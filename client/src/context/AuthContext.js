@@ -20,29 +20,24 @@ checkAuth();
 }, []);
 
 const checkAuth = async () => {
-try {
-const token = localStorage.getItem('token');
+  try {
+    const token = localStorage.getItem('token');
 
+    if (!token) {
+      setLoading(false);
+      return;
+    }
 
-  if (!token) {
+    const res = await api.get('/auth/me');
+
+    setUser(res.data || res);
+  } catch (error) {
+    localStorage.removeItem('token');
+    setUser(null);
+  } finally {
     setLoading(false);
-    return;
   }
-
-  const res = await api.get('/auth/me');
-  setUser(res.user);
-
-} catch (error) {
-  console.log('Auth check failed:', error.message);
-  localStorage.removeItem('token');
-  setUser(null);
-} finally {
-  setLoading(false);
-}
-
-
 };
-
 const login = async (email, password) => {
   try {
     const res = await api.post('/auth/login', { email, password });
