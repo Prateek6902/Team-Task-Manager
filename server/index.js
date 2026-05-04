@@ -2,30 +2,34 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const path = require('path');
 
 dotenv.config();
 
 const app = express();
 
-// CORS configuration
+// ✅ FIXED CORS CONFIG
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? false  // Same origin in production
-    : (process.env.CLIENT_URL || 'http://localhost:3000'),
+  origin: [
+    'https://team-task-manager-gtdo.onrender.com', // frontend
+    'http://localhost:3000' // local dev
+  ],
   credentials: true
 }));
+
+// ✅ handle preflight requests
+app.options('*', cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ... ALL YOUR MODELS AND ROUTES (everything between cors and production setup) ...
+// ================= ROUTES =================
+// (your routes go here)
 
 // ============ PRODUCTION SETUP ============
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/build')));
-  
+
   app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
   });
@@ -43,9 +47,8 @@ app.use((err, req, res, next) => {
 
 // ============ START SERVER ============
 const PORT = process.env.PORT || 5000;
-const MONGODB_URI = process.env.MONGODB_URI;
 
-mongoose.connect(MONGODB_URI)
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
     console.log('✅ MongoDB connected');
     app.listen(PORT, '0.0.0.0', () => {
