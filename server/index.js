@@ -12,7 +12,10 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: [
+    "http://localhost:3000",
+    "https://team-task-manager-gtdo.onrender.com"
+  ],
   credentials: true
 }));
 app.use(express.json());
