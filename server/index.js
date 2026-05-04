@@ -8,25 +8,21 @@ dotenv.config();
 
 const app = express();
 
-// ✅ FIXED CORS CONFIG
-app.use(cors({
-  origin: [
-    'https://team-task-manager-gtdo.onrender.com', // frontend
-    'http://localhost:3000' // local dev
-  ],
-  credentials: true
-}));
+// ✅ SIMPLE CORS (works 100%)
+app.use(cors());
 
-// ✅ handle preflight requests
+// ✅ Preflight support
 app.options('*', cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ================= ROUTES =================
-// (your routes go here)
+const authRoutes = require('./routes/auth'); // adjust path if needed
 
-// ============ PRODUCTION SETUP ============
+app.use('/api/auth', authRoutes);
+
+// ================= PRODUCTION =================
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/build')));
 
@@ -35,22 +31,22 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-// ============ ERROR HANDLER ============
+// ================= ERROR HANDLER =================
 app.use((err, req, res, next) => {
   console.error('Global error:', err);
   res.status(500).json({
     success: false,
-    message: 'Internal Server Error',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    message: 'Internal Server Error'
   });
 });
 
-// ============ START SERVER ============
+// ================= START =================
 const PORT = process.env.PORT || 5000;
 
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
     console.log('✅ MongoDB connected');
+
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`✅ Server running on port ${PORT}`);
     });
