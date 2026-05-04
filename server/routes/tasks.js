@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+
 const {
   createTask,
   getTasks,
@@ -9,12 +10,13 @@ const {
   updateTaskStatus,
   addComment
 } = require('../controllers/taskController');
+
 const { protect } = require('../middleware/auth');
 
-// All routes require authentication
 router.use(protect);
 
-// Routes
+// ================= ROUTES =================
+
 router.route('/')
   .get(getTasks)
   .post(createTask);
@@ -24,7 +26,10 @@ router.route('/:id')
   .put(updateTask)
   .delete(deleteTask);
 
+// 🔥 THIS WAS CRASHING
 router.patch('/:id/status', updateTaskStatus);
+
+// Comments
 router.post('/:id/comments', addComment);
 
 module.exports = router;
