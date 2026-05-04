@@ -2,49 +2,57 @@ const Project = require('../models/Project');
 const Task = require('../models/Task');
 
 exports.createProject = async (req, res) => {
-  const project = await Project.create({
-    ...req.body,
-    createdBy: req.user._id,
-    members: [{ user: req.user._id, role: 'admin' }]
-  });
-  res.json({ project });
+  try {
+    const project = await Project.create({
+      ...req.body,
+      createdBy: req.user._id,
+      members: [{ user: req.user._id, role: 'admin' }]
+    });
+
+    res.json({ success: true, data: project });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
 exports.getProjects = async (req, res) => {
-  const projects = await Project.find();
-  res.json({ projects });
+  try {
+    const projects = await Project.find();
+    res.json({ success: true, data: projects });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
 exports.getProject = async (req, res) => {
-  const project = await Project.findById(req.params.id);
-  res.json({ project });
+  try {
+    const project = await Project.findById(req.params.id);
+    res.json({ success: true, data: project });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
 exports.updateProject = async (req, res) => {
-  const project = await Project.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  res.json({ project });
+  try {
+    const project = await Project.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.json({ success: true, data: project });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
 exports.deleteProject = async (req, res) => {
-  await Project.findByIdAndDelete(req.params.id);
-  await Task.deleteMany({ project: req.params.id });
-  res.json({ message: 'Deleted' });
-};
+  try {
+    await Project.findByIdAndDelete(req.params.id);
+    await Task.deleteMany({ project: req.params.id });
 
-exports.addMember = async (req, res) => {
-  const project = await Project.findById(req.params.id);
-  project.members.push(req.body);
-  await project.save();
-  res.json({ project });
-};
-
-exports.removeMember = async (req, res) => {
-  const project = await Project.findById(req.params.id);
-
-  project.members = project.members.filter(
-    m => m.user.toString() !== req.params.userId
-  );
-
-  await project.save();
-  res.json({ project });
+    res.json({ success: true, message: 'Project deleted' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
