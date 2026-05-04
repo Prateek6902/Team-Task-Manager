@@ -8,17 +8,26 @@ dotenv.config();
 
 const app = express();
 
-// ✅ SIMPLE CORS (works 100%)
-app.use(cors());
+// ================= CORS CONFIG (FINAL FIX) =================
+app.use(cors({
+  origin: [
+    'https://team-task-manager-gtdo.onrender.com', // frontend
+    'http://localhost:3000' // local dev
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 
-// ✅ Preflight support
+// Handle preflight requests
 app.options('*', cors());
 
+// ================= BODY PARSER =================
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ================= ROUTES =================
-const authRoutes = require('./routes/auth'); // adjust path if needed
+// ================= ROUTES (IMPORTANT: BEFORE STATIC) =================
+const authRoutes = require('./routes/auth');
 
 app.use('/api/auth', authRoutes);
 
@@ -26,6 +35,7 @@ app.use('/api/auth', authRoutes);
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/build')));
 
+  // React SPA fallback
   app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
   });
@@ -40,7 +50,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ================= START =================
+// ================= START SERVER =================
 const PORT = process.env.PORT || 5000;
 
 mongoose.connect(process.env.MONGODB_URI)
