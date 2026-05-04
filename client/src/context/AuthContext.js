@@ -23,7 +23,7 @@ const checkAuth = async () => {
 try {
 const token = localStorage.getItem('token');
 
-```
+
   if (!token) {
     setLoading(false);
     return;
@@ -39,7 +39,7 @@ const token = localStorage.getItem('token');
 } finally {
   setLoading(false);
 }
-```
+
 
 };
 
@@ -50,7 +50,7 @@ email,
 password
 });
 
-```
+
   const { token, user } = res;
 
   localStorage.setItem('token', token);
@@ -63,7 +63,7 @@ password
     message: error?.response?.data?.message || 'Login failed'
   };
 }
-```
+
 
 };
 
@@ -75,7 +75,7 @@ email,
 password
 });
 
-```
+
   const { token, user } = res;
 
   localStorage.setItem('token', token);
@@ -88,7 +88,7 @@ password
     message: error?.response?.data?.message || 'Register failed'
   };
 }
-```
+
 
 };
 
