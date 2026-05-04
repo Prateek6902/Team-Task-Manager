@@ -44,28 +44,18 @@ const token = localStorage.getItem('token');
 };
 
 const login = async (email, password) => {
-try {
-const res = await api.post('/auth/login', {
-email,
-password
-});
+  try {
+    const res = await api.post('/auth/login', { email, password });
 
+    const { token, user } = res.data || res;
 
-  const { token, user } = res;
+    localStorage.setItem('token', token); // ✅ IMPORTANT
+    setUser(user);
 
-  localStorage.setItem('token', token);
-  setUser(user);
-
-  return { success: true };
-
-} catch (error) {
-  return {
-    success: false,
-    message: error?.response?.data?.message || 'Login failed'
-  };
-}
-
-
+    return { success: true };
+  } catch (error) {
+    return { success: false };
+  }
 };
 
 const register = async (name, email, password) => {
