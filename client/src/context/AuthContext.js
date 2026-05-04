@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import api from '../api'; // make sure path is correct
+import api from '../services/api'; // ✅ FIXED PATH
 
 const AuthContext = createContext();
 
@@ -29,7 +29,9 @@ export const AuthProvider = ({ children }) => {
       }
 
       const response = await api.get('/auth/me');
-      setUser(response.data || response.user);
+
+      // ✅ FIXED (api already returns data)
+      setUser(response.data || response.user || response);
     } catch (error) {
       console.log('Auth check failed:', error.message);
 
@@ -49,7 +51,9 @@ export const AuthProvider = ({ children }) => {
         password
       });
 
+      // ✅ FIXED (no .data here)
       const { token, user: userData } = response;
+
       localStorage.setItem('token', token);
       setUser(userData);
 
@@ -58,7 +62,7 @@ export const AuthProvider = ({ children }) => {
       console.error('Login error:', error);
       return {
         success: false,
-        message: error?.message || 'Cannot connect to server'
+        message: error?.response?.data?.message || 'Cannot connect to server'
       };
     }
   };
@@ -71,7 +75,9 @@ export const AuthProvider = ({ children }) => {
         password
       });
 
+      // ✅ FIXED
       const { token, user: userData } = response;
+
       localStorage.setItem('token', token);
       setUser(userData);
 
@@ -80,7 +86,7 @@ export const AuthProvider = ({ children }) => {
       console.error('Registration error:', error);
       return {
         success: false,
-        message: error?.message || 'Cannot connect to server'
+        message: error?.response?.data?.message || 'Cannot connect to server'
       };
     }
   };
