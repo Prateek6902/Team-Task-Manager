@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API =
   process.env.REACT_APP_API_URL ||
-  "https://team-task-manager-3-jks2.onrender.com;
+  "https://team-task-manager-3-jks2.onrender.com";
 
 const api = axios.create({
   baseURL: `${API}/api`,
