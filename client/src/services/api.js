@@ -1,18 +1,20 @@
 import axios from 'axios';
 
-// Use env OR fallback (IMPORTANT)
-const API_URL =
-  process.env.REACT_APP_API_URL ||
-  "https://team-task-manager-3-jks2.onrender.com";
+// For production: Use RELATIVE URLs (no domain needed)
+// For development: Use localhost
+const API_URL = process.env.NODE_ENV === 'production' 
+  ? ''  // Empty string = use relative URLs
+  : 'http://localhost:5000';
 
 const api = axios.create({
   baseURL: `${API_URL}/api`,
   headers: {
     'Content-Type': 'application/json'
-  }
+  },
+  timeout: 15000
 });
 
-// Request interceptor
+// Request interceptor - Add auth token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -24,13 +26,15 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor
+// Response interceptor - Handle errors
 api.interceptors.response.use(
   (response) => response.data,
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
-      window.location.href = '/login';
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
