@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API =
   process.env.REACT_APP_API_URL ||
-  "https://team-task-manager-3-jks2.onrender.com";
+  "https://team-task-manager-myro.onrender.com";
 
 const api = axios.create({
   baseURL: `${API}/api`,
@@ -11,6 +11,7 @@ const api = axios.create({
   },
 });
 
+// Attach token
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
@@ -19,6 +20,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Handle errors
 api.interceptors.response.use(
   (response) => response.data,
   (error) => {
