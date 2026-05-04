@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import * as authService from '../services/authService';
+import { getMe, login, register, logout } from '../services/authService';
 
 const AuthContext = createContext();
 
@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const token = localStorage.getItem('token');
       if (token) {
-        const response = await authService.getCurrentUser();
+        const response = await getMe();
         setUser(response.data || response.user);
       }
     } catch (error) {
@@ -35,9 +35,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (email, password) => {
+  const handleLogin = async (email, password) => {
     try {
-      const response = await authService.loginUser(email, password);
+      const response = await login(email, password);
       const { token, user: userData } = response;
       localStorage.setItem('token', token);
       setUser(userData);
@@ -45,14 +45,14 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       return {
         success: false,
-        message: error.response?.data?.message || 'Login failed. Please check your connection.'
+        message: error.response?.data?.message || 'Login failed'
       };
     }
   };
 
-  const register = async (name, email, password) => {
+  const handleRegister = async (name, email, password) => {
     try {
-      const response = await authService.registerUser({ name, email, password });
+      const response = await register({ name, email, password });
       const { token, user: userData } = response;
       localStorage.setItem('token', token);
       setUser(userData);
@@ -60,12 +60,12 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       return {
         success: false,
-        message: error.response?.data?.message || 'Registration failed. Please check your connection.'
+        message: error.response?.data?.message || 'Registration failed'
       };
     }
   };
 
-  const logout = () => {
+  const handleLogout = () => {
     localStorage.removeItem('token');
     setUser(null);
   };
@@ -73,10 +73,9 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     loading,
-    login,
-    register,
-    logout,
-    checkAuth
+    login: handleLogin,
+    register: handleRegister,
+    logout: handleLogout
   };
 
   return (
