@@ -38,9 +38,9 @@ const Tasks = () => {
     setLoading(true);
 
     const res = await taskService.getTasks(filters);
-    const data = res.data || res;
+const data = res.data.data || [];
 
-    setTasks(Array.isArray(data) ? data : []);
+setTasks(data);
 
   } catch (error) {
     console.error('Error fetching tasks:', error);
