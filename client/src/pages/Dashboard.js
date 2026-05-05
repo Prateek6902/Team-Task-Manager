@@ -364,6 +364,4 @@ const Dashboard = () => {
 export default Dashboard;
 
   // ... rest of your Dashboard component stays the same ...
-};
 
-export default Dashboard;
