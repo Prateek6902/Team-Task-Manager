@@ -4,11 +4,7 @@ import api from '../services/api';
 const AuthContext = createContext();
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
-  }
-  return context;
+  return useContext(AuthContext);
 };
 
 export const AuthProvider = ({ children }) => {
@@ -19,7 +15,6 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  // ✅ FIXED
   const checkAuth = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -30,8 +25,6 @@ export const AuthProvider = ({ children }) => {
       }
 
       const res = await api.get('/auth/me');
-
-      // 🔥 FIX HERE
       setUser(res.data.user);
 
     } catch (error) {
@@ -42,58 +35,47 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // ✅ FIXED
   const login = async (email, password) => {
-  try {
-    const res = await api.post('/auth/login', { email, password });
+    try {
+      const res = await api.post('/auth/login', { email, password });
 
-    console.log('LOGIN RESPONSE:', res.data); // 🔍 IMPORTANT DEBUG
+      const { token, user } = res.data;
 
-    // 🔥 HANDLE ALL CASES
-    const token = res.data.token || res.data.data?.token;
-    const user = res.data.user || res.data.data?.user;
+      localStorage.setItem('token', token);
+      setUser(user);
 
-    if (!token) {
-      throw new Error('Token not received from server');
+      return { success: true };
+
+    } catch (error) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Login failed'
+      };
     }
+  };
 
-    localStorage.setItem('token', token);
-    setUser(user);
-
-    return { success: true };
-  } catch (error) {
-    console.error(error);
-
-    return {
-      success: false,
-      message: error?.response?.data?.message || error.message || 'Login failed'
-    };
-  }
-};
-
-  // ✅ FIXED
   const register = async (name, email, password) => {
-  try {
-    const res = await api.post('/auth/register', {
-      name,
-      email,
-      password
-    });
+    try {
+      const res = await api.post('/auth/register', {
+        name,
+        email,
+        password
+      });
 
-    const token = res.data.token || res.data.data?.token;
-    const user = res.data.user || res.data.data?.user;
+      const { token, user } = res.data;
 
-    localStorage.setItem('token', token);
-    setUser(user);
+      localStorage.setItem('token', token);
+      setUser(user);
 
-    return { success: true };
-  } catch (error) {
-    return {
-      success: false,
-      message: error?.response?.data?.message || 'Register failed'
-    };
-  }
-};
+      return { success: true };
+
+    } catch (error) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || 'Register failed'
+      };
+    }
+  };
 
   const logout = () => {
     localStorage.removeItem('token');
