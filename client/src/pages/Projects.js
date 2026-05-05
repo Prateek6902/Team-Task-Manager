@@ -15,13 +15,17 @@ import { motion } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
 import * as projectService from '../services/projectService';
 import toast from 'react-hot-toast';
-const [statusFilter, setStatusFilter] = useState('');
+
 const Projects = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('newest');
+
+  // ✅ MOVE HERE
+  const [statusFilter, setStatusFilter] = useState('');
+
   const [newProject, setNewProject] = useState({
     name: '',
     description: '',
