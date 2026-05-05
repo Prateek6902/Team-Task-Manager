@@ -3,10 +3,10 @@ import axios from 'axios';
 const API_URL = process.env.REACT_APP_API_URL;
 
 const api = axios.create({
-  baseURL: `${API_URL}/api`
+  baseURL: `${API_URL}/api`,
 });
 
-// 🔥 Attach token to EVERY request
+// Attach token to every request
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
 
