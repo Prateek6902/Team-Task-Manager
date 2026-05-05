@@ -44,47 +44,56 @@ export const AuthProvider = ({ children }) => {
 
   // ✅ FIXED
   const login = async (email, password) => {
-    try {
-      const res = await api.post('/auth/login', { email, password });
+  try {
+    const res = await api.post('/auth/login', { email, password });
 
-      // 🔥 FIX HERE
-      const { token, user } = res.data;
+    console.log('LOGIN RESPONSE:', res.data); // 🔍 IMPORTANT DEBUG
 
-      localStorage.setItem('token', token);
-      setUser(user);
+    // 🔥 HANDLE ALL CASES
+    const token = res.data.token || res.data.data?.token;
+    const user = res.data.user || res.data.data?.user;
 
-      return { success: true };
-    } catch (error) {
-      return {
-        success: false,
-        message: error?.response?.data?.message || 'Login failed'
-      };
+    if (!token) {
+      throw new Error('Token not received from server');
     }
-  };
+
+    localStorage.setItem('token', token);
+    setUser(user);
+
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+
+    return {
+      success: false,
+      message: error?.response?.data?.message || error.message || 'Login failed'
+    };
+  }
+};
 
   // ✅ FIXED
   const register = async (name, email, password) => {
-    try {
-      const res = await api.post('/auth/register', {
-        name,
-        email,
-        password
-      });
+  try {
+    const res = await api.post('/auth/register', {
+      name,
+      email,
+      password
+    });
 
-      // 🔥 FIX HERE
-      const { token, user } = res.data;
+    const token = res.data.token || res.data.data?.token;
+    const user = res.data.user || res.data.data?.user;
 
-      localStorage.setItem('token', token);
-      setUser(user);
+    localStorage.setItem('token', token);
+    setUser(user);
 
-      return { success: true };
-    } catch (error) {
-      return {
-        success: false,
-        message: error?.response?.data?.message || 'Register failed'
-      };
-    }
-  };
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      message: error?.response?.data?.message || 'Register failed'
+    };
+  }
+};
 
   const logout = () => {
     localStorage.removeItem('token');
