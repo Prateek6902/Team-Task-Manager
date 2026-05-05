@@ -39,16 +39,14 @@ const Dashboard = () => {
     setLoading(true);
 
     const res = await dashboardService.getDashboardData();
-
-    const data = res.data || res;
+    const data = res.data;
 
     setStats(data.stats || {});
     setRecentTasks(data.recentTasks || []);
     setChartData(data.weeklyData || []);
 
   } catch (error) {
-    console.error('Dashboard error:', error);
-    toast.error('Failed to load dashboard data');
+    console.error(error);
   } finally {
     setLoading(false);
   }
