@@ -38,7 +38,7 @@ const Tasks = () => {
     setLoading(true);
 
     const res = await taskService.getTasks(filters);
-const data = res.data.data || [];
+    const data = res.data.data || [];
 
 setTasks(data);
 
