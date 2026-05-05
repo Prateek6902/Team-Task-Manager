@@ -40,7 +40,7 @@ const Tasks = () => {
     const res = await taskService.getTasks(filters);
     const data = res.data.data || [];
 
-setTasks(data);
+    setTasks(data);
 
   } catch (error) {
     console.error('Error fetching tasks:', error);
