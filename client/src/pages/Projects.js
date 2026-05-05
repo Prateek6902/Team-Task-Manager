@@ -38,13 +38,11 @@ const Projects = () => {
     setLoading(true);
 
     const res = await projectService.getProjects();
-    const data = res.data || res;
+    const data = res.data.data || [];
 
-    setProjects(Array.isArray(data) ? data : []);
+    setProjects(data);
 
   } catch (error) {
-    console.error('Error fetching projects:', error);
-    toast.error('Failed to load projects');
     setProjects([]);
   } finally {
     setLoading(false);
