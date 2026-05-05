@@ -1,3 +1,5 @@
+import { Paper } from '@mui/material';
+import { Group, AdminPanelSettings, Person } from '@mui/icons-material';
 import React, { useState, useEffect } from 'react';
 import {
   Box, Grid, Card, CardContent, Typography, Avatar,
@@ -22,9 +24,9 @@ const Team = () => {
     setLoading(true);
 
     const res = await userService.getUsers();
-    const data = res.data || res;
+    const data = res.data.data || [];
 
-    setMembers(Array.isArray(data) ? data : []);
+    setMembers(data);
 
   } catch (error) {
     console.error('Error fetching team:', error);
