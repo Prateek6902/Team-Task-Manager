@@ -80,6 +80,24 @@ const Tasks = () => {
       }
     }
   };
+  const handleOpenDialog = (task = null) => {
+  if (task) {
+    setEditingTask(task);
+    setFormData(task);
+  } else {
+    setEditingTask(null);
+    setFormData({
+      title: '',
+      description: '',
+      project: '',
+      assignedTo: '',
+      dueDate: '',
+      priority: 'medium',
+      status: 'todo'
+    });
+  }
+  setOpenDialog(true);
+};
   
   const getPriorityColor = (priority) => {
     const colors = { urgent: 'error', high: 'warning', medium: 'info', low: 'success' };
