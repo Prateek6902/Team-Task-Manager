@@ -27,3 +27,8 @@ export const addProjectMember = (projectId, userId, role) => {
 export const removeProjectMember = (projectId, userId) => {
   return api.delete(`/projects/${projectId}/members/${userId}`);
 };
+
+// Optional: Update project progress manually
+export const updateProjectProgress = (projectId) => {
+  return api.put(`/projects/${projectId}/progress`);
+};
