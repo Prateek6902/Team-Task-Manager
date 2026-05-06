@@ -6,16 +6,12 @@ const {
   getTasks,
   getTask,
   updateTask,
-  deleteTask,
-  updateTaskStatus,
-  addComment
+  deleteTask
 } = require('../controllers/taskController');
 
 const { protect } = require('../middleware/auth');
 
 router.use(protect);
-
-// ================= ROUTES =================
 
 router.route('/')
   .get(getTasks)
@@ -25,11 +21,5 @@ router.route('/:id')
   .get(getTask)
   .put(updateTask)
   .delete(deleteTask);
-
-// 🔥 THIS WAS CRASHING
-router.patch('/:id/status', updateTaskStatus);
-
-// Comments
-router.post('/:id/comments', addComment);
 
 module.exports = router;
