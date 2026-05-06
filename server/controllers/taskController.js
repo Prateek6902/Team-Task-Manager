@@ -1,72 +1,102 @@
 const Task = require('../models/Task');
 
-// ================= CREATE =================
 exports.createTask = async (req, res) => {
   try {
+    console.log("BODY:", req.body);
+    console.log("USER:", req.user);
+
     const task = await Task.create({
-      ...req.body,
+      title: req.body.title,
+      description: req.body.description,
+      priority: req.body.priority,
+      status: req.body.status,
+      dueDate: req.body.dueDate,
       createdBy: req.user._id
     });
 
-    res.json({ success: true, data: task });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    res.status(201).json({
+      success: true,
+      data: task
+    });
+
+  } catch (error) {
+    console.error("CREATE TASK ERROR:", error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
   }
 };
 
-// ================= GET ALL =================
 exports.getTasks = async (req, res) => {
-  const tasks = await Task.find();
-  res.json({ success: true, data: tasks });
-};
-
-// ================= GET ONE =================
-exports.getTask = async (req, res) => {
-  const task = await Task.findById(req.params.id);
-  res.json({ success: true, data: task });
-};
-
-// ================= UPDATE =================
-exports.updateTask = async (req, res) => {
-  const task = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  res.json({ success: true, data: task });
-};
-
-// ================= DELETE =================
-exports.deleteTask = async (req, res) => {
-  await Task.findByIdAndDelete(req.params.id);
-  res.json({ success: true, message: 'Deleted' });
-};
-
-// ================= UPDATE STATUS (IMPORTANT FIX) =================
-exports.updateTaskStatus = async (req, res) => {
   try {
-    const task = await Task.findByIdAndUpdate(
-      req.params.id,
-      { status: req.body.status },
-      { new: true }
-    );
+    const tasks = await Task.find();
 
-    res.json({ success: true, data: task });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    res.status(200).json({
+      success: true,
+      data: tasks
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
   }
 };
 
-// ================= ADD COMMENT =================
-exports.addComment = async (req, res) => {
+exports.getTask = async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
 
-    task.comments.push({
-      user: req.user._id,
-      text: req.body.text
+    res.status(200).json({
+      success: true,
+      data: task
     });
 
-    await task.save();
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
 
-    res.json({ success: true, data: task });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+exports.updateTask = async (req, res) => {
+  try {
+    const task = await Task.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      data: task
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+exports.deleteTask = async (req, res) => {
+  try {
+    await Task.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({
+      success: true,
+      message: 'Task deleted'
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
   }
 };
