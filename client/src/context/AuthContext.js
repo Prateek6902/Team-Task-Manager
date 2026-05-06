@@ -1,32 +1,27 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import api from '../services/api';
+import { login as loginAPI, register as registerAPI, getMe } from '../services/authService';
 
 const AuthContext = createContext();
 
 export const useAuth = () => {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+  if (!context) throw new Error('useAuth must be used within AuthProvider');
+  return context;
 };
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
+  useEffect(() => { checkAuth(); }, []);
 
   const checkAuth = async () => {
     try {
       const token = localStorage.getItem('token');
-
-      if (!token) {
-        setLoading(false);
-        return;
+      if (token) {
+        const response = await getMe();
+        setUser(response.data || response.user);
       }
-
-      const res = await api.get('/auth/me');
-      setUser(res.data.user);
-
     } catch (error) {
       localStorage.removeItem('token');
       setUser(null);
@@ -36,60 +31,32 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (email, password) => {
-  try {
-    const res = await api.post('/auth/login', { email, password });
-
-    console.log('LOGIN RESPONSE:', res.data); // 🔍 IMPORTANT DEBUG
-
-    // 🔥 HANDLE ALL CASES
-    const token = res.data.token || res.data.data?.token;
-    const user = res.data.user || res.data.data?.user;
-
-    if (!token) {
-      throw new Error('Token not received from server');
-    }
-
-    localStorage.setItem('token', token);
-    setUser(user);
-
-    return { success: true };
-  } catch (error) {
-    console.error(error);
-
-    return {
-      success: false,
-      message: error?.response?.data?.message || error.message || 'Login failed'
-    };
-  }
-};
-
-  const register = async (name, email, password) => {
     try {
-      const res = await api.post('/auth/register', {
-        name,
-        email,
-        password
-      });
-
-      const { token, user } = res.data;
-
+      const response = await loginAPI(email, password);
+      const { token, user: userData } = response;
       localStorage.setItem('token', token);
-      setUser(user);
-
+      setUser(userData);
       return { success: true };
-
     } catch (error) {
-      return {
-        success: false,
-        message: error?.response?.data?.message || 'Register failed'
-      };
+      return { success: false, message: error?.response?.data?.message || 'Login failed' };
+    }
+  };
+
+  const register = async (userData) => {
+    try {
+      const response = await registerAPI(userData);
+      const { token, user: userDataResponse } = response;
+      localStorage.setItem('token', token);
+      setUser(userDataResponse);
+      return { success: true };
+    } catch (error) {
+      return { success: false, message: error?.response?.data?.message || 'Registration failed' };
     }
   };
 
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
-    window.location.href = '/login';
   };
 
   return (
